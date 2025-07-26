@@ -7,15 +7,18 @@ import OnlineDrones from "./components/OnlineDrones"
 import DangerousDrones from "./components/DangerousDrones"
 import FlightPathViewer from "./components/FlightPathViewer"
 import NearbyDrones from "./components/NearbyDrones"
-import { AuthProvider } from "./contexts/AuthContext"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
 
   return (
-    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" index  element={<Dashboard />}/>
             <Route path="drones-list" index  element={<DronesList />}/>
             <Route path="online-drones" index  element={<OnlineDrones />}/>
@@ -26,7 +29,6 @@ function App() {
           <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
   )
 }
 

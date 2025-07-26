@@ -1,27 +1,10 @@
-import { useEffect, useState } from "react";
-import { getAllDrones } from "../api/drones";
 import Table from "./Table";
-import type { Point } from "geojson";
-
-export type Drone = {
-  serial_number: string,
-  is_dangerous: boolean,
-  dangerous_reason: string,
-  last_location: Point,
-  last_seen: string,
-};
+import useDrones from "../hooks/useDrones";
 
 
 
 const DronesList = () => {
-  const [drones, setDrones] = useState<Drone[]>([]);
-
-  useEffect(() => {
-    getAllDrones().then((data) => {setDrones(data); console.log(data);
-    });
-    
-    
-  }, []);
+  const {drones} = useDrones();
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">

@@ -9,7 +9,7 @@ import {
   type PaginationState,
 } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Drone } from "./DronesList";
+import type { Drone } from '../contexts/DronesContext'
 
 
 
@@ -17,7 +17,7 @@ import type { Drone } from "./DronesList";
 export default function Table({ data }: {data: Drone[]}) {
 
   const [pagination, setPagination] = useState<PaginationState>({
-    pageSize: 6,
+    pageSize: 7,
     pageIndex: 0
   });
 

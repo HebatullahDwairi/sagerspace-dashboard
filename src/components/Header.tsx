@@ -42,7 +42,7 @@ export default function Header () {
           <p>33</p>
         </div>
         {
-          context?.user?.userid ? 
+          context?.user?.user_id ? 
             <div className="flex gap-3 items-center">
               <Bell size={19} color="gray"/>
               <CircleUser  size={24} color="gray"/>

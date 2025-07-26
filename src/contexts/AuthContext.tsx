@@ -1,31 +1,48 @@
-import { createContext,useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { createContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { api } from "../api/apiClient";
 import { jwtDecode } from "jwt-decode";
+import useRefreshToken from "../hooks/useRefreshToken";
 
 type AuthContextType = {
-  user: {userid: number} | null,
-  setUser: Dispatch<SetStateAction<{userid: number}>>,
+  user: User | null,
+  setUser: Dispatch<SetStateAction<User | null>>,
   isLoading: boolean,
   login: (username: string, password: string) => void,
+  accessToken: string,
+};
+
+export type User = {
+  user_id: number
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider : React.FC<{children: React.ReactNode}> = ({children}) => {
-  const [user, setUser] = useState<{userid: number} | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [accessToken, setAccessToken] = useState('');
+  const refresh = useRefreshToken();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access_token');
-    if(accessToken) {
-      setUser({
-        userid: jwtDecode(accessToken).user_id
-      });
-    }
-  }, []);
+    const initAuth = async () => {
+      try {
+        const newToken = await refresh();
+        setAccessToken(newToken);
+        const decoded: User = jwtDecode(newToken);
+        setUser({ user_id: decoded.user_id });
+      } catch (err) {
+        setUser(null);
+        console.log(err);
+        
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+    initAuth();
+  }, [refresh]);
 
   const login = async (username: string, password: string) => {
+    setIsLoading(true);
     try {
       const res = await api.post('/token/', {
         username,
@@ -33,12 +50,9 @@ export const AuthProvider : React.FC<{children: React.ReactNode}> = ({children})
       });
 
       const accessToken = res.data.access;
-      localStorage.setItem('access_token', accessToken);
-      const user = jwtDecode(accessToken);
-      setUser({userid: user.user_id});
-      console.log(user.user_id);
-
-
+      setAccessToken(accessToken);
+      const user: User = jwtDecode(accessToken);
+      setUser({user_id: user.user_id});
     } 
     catch (error) {
       console.log(error);
@@ -50,7 +64,7 @@ export const AuthProvider : React.FC<{children: React.ReactNode}> = ({children})
   }
 
   return (
-    <AuthContext.Provider value={{user, setUser , isLoading, login}}>
+    <AuthContext.Provider value={{user, setUser , isLoading, login, accessToken}}>
       {children}
     </AuthContext.Provider>
   );

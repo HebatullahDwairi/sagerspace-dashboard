@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+.mapboxgl-popup-close-button {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  top: 4px;
+  right: 4px;
+}
+
+.mapboxgl-popup-close-button:hover {
+  background-color: #444;
+  cursor: pointer;
+}

@@ -17,7 +17,7 @@ export default function Sidebar () {
 
   const [isOpen, setIsOpen] = useState(() => {
     const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    const isSmallScreen = window.innerWidth < 640;
+    const isSmallScreen = window.innerWidth < 740;
     return !(isPortrait || isSmallScreen);
   });
   return (
