@@ -2,15 +2,25 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxMap, { NavigationControl, FullscreenControl, Source, Layer, type MapRef, Popup } from 'react-map-gl/mapbox';
 import type { Drone } from '../contexts/DronesContext';
 import { useRef, useState } from 'react';
-import droneIcon from '../assets/drone.png';
+import blackDrone from '../assets/drone-new.png';
+import redDrone from '../assets/drone-red.png';
+import { circle } from '@turf/circle';
+import type { LineString } from 'geojson';
 
-const Map = ({ drones }: { drones: Drone[] }) => {
+type MapProps = {
+  drones: Drone[],
+  point? : number[],
+  flightPath?: LineString
+};
+
+const Map = ({ drones, point, flightPath }: MapProps) => {
   const points = drones.map(drone => (
     {
       type: 'Feature' as const,
       geometry: drone.last_location,
       properties: {
-        serial: drone.serial_number
+        serial: drone.serial_number,
+        icon: drone.is_dangerous ?  'red-drone' : 'black-drone'
       }
     }
   ));
@@ -42,10 +52,15 @@ const Map = ({ drones }: { drones: Drone[] }) => {
           const map = mapRef.current?.getMap();
           if(!map) return;
 
-          map?.loadImage(droneIcon, (error, image) => {
+          map?.loadImage(blackDrone, (error, image) => {
             if (error || !image) return;
 
-            map.addImage('drone-icon', image);
+            map.addImage('black-drone', image);
+          });
+          map?.loadImage(redDrone, (error, image) => {
+            if (error || !image) return;
+
+            map.addImage('red-drone', image);
           });
 
           map.on('click', 'drone', (e) => {
@@ -60,6 +75,43 @@ const Map = ({ drones }: { drones: Drone[] }) => {
             console.log(drone);
             
           });
+
+
+          if(point) {
+
+            const c = circle(point, 5, { steps: 60, units: 'kilometers' });
+            map.addSource('circle', {
+              type: 'geojson',
+              data: c
+            });
+            map.addLayer({
+              id: 'point',
+              source: 'circle',
+              type: 'line',
+              paint: {
+                'line-color': 'red',
+                'line-width': 2
+              }
+            });
+
+          }
+
+          if(flightPath) {
+            map.addSource('flightpath', {
+              type: 'geojson',
+              data: flightPath
+            });
+            map.addLayer({
+              id: 'path',
+              source: 'flightpath',
+              type: 'line',
+              paint: {
+                'line-color': 'white',
+                'line-dasharray': [2,2],
+                'line-width': 2
+              }
+            });
+          }
           
          }
         }
@@ -73,7 +125,8 @@ const Map = ({ drones }: { drones: Drone[] }) => {
             id='drone'
             type='symbol'
             layout={{
-              'icon-image': 'drone-icon'
+              'icon-image': ['get', 'icon'],
+              'icon-size': 0.5
             }}
             
           />
