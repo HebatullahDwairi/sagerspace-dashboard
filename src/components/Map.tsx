@@ -2,8 +2,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxMap, { NavigationControl, FullscreenControl, Source, Layer, type MapRef, Popup } from 'react-map-gl/mapbox';
 import type { Drone } from '../contexts/DronesContext';
 import { useRef, useState } from 'react';
-import blackDrone from '../assets/drone-new.png';
-import redDrone from '../assets/drone-red.png';
+import blackDrone from '../assets/drone-icon.png';
+import redDrone from '../assets/danger-drone-icon.png';
 import { circle } from '@turf/circle';
 import type { LineString } from 'geojson';
 
@@ -126,7 +126,15 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             type='symbol'
             layout={{
               'icon-image': ['get', 'icon'],
-              'icon-size': 0.5
+              'icon-size': 0.4
+            }}
+            paint={{
+              'icon-opacity-transition' : {duration: 0},
+              'icon-color-transition' : {duration: 0},
+              'icon-halo-blur-transition': {duration: 0},
+              'icon-halo-color-transition': {duration: 0},
+              'icon-halo-width-transition': {duration: 0},
+
             }}
             
           />
