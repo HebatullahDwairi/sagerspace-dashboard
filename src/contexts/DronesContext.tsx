@@ -4,10 +4,12 @@ import type { Point } from "geojson";
 import mqttClient from '../config/mqtt';
 import {point} from '@turf/turf';
 import useAuth from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 type DronesContextType = {
   onlineDrones: Drone[],
   dangerousDrones: Drone[],
+  isConnected: boolean
 };
 
 export type Drone = {
@@ -24,6 +26,7 @@ const DronesContext = createContext<DronesContextType | null>(null);
 export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children}) => {
   const [onlineDrones, setOnlineDrones] = useState<Drone[]>([]);
   const [dangerousDrones, setDangerousDrones] = useState<Drone[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
   const api = useAxios();
   const {user} = useAuth();
 
@@ -67,10 +70,15 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
       const isDangerous = reason.length > 0;
       const now = new Date().toISOString();
 
+      
+
 
       let existingDrone = onlineDrones.find(d => d.serial_number === serial);
 
       if(existingDrone) {
+        if(isDangerous && !existingDrone.is_dangerous) {
+          toast.error(`Drone with serial ${serial} is dangerous!`);
+        }
         setOnlineDrones((prev) => {
           return prev.map(d => {
           const updated : Drone = {
@@ -123,6 +131,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
 
     mqttClient.on('connect', function () {
       console.log('connected');
+      setIsConnected(true);
     });
 
     mqttClient.subscribe('thing/product/+/osd', () => {
@@ -139,7 +148,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
 
 
   return (
-    <DronesContext.Provider value={{ onlineDrones, dangerousDrones}}>
+    <DronesContext.Provider value={{ onlineDrones, dangerousDrones, isConnected}}>
       {children}
     </DronesContext.Provider>
   );

@@ -1,13 +1,15 @@
-import { CircleUser,Bell, CloudSun, Search } from "lucide-react";
+import { CircleUser, CloudSun, Search, Circle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
+import useDrones from "../hooks/useDrones";
 
 export default function Header () {
 
   const date= new Date();
   const [mins, setMins] = useState(date.getMinutes());
   const [hours, setHours] = useState(date.getHours());
+  const {isConnected} = useDrones();
   useEffect(() => {
     const interval = setInterval(() => {
       const date= new Date();
@@ -44,7 +46,8 @@ export default function Header () {
         {
           context?.user?.user_id ? 
             <div className="flex gap-3 items-center">
-              <Bell size={19} color="gray"/>
+              <p className="text-gray-500">{isConnected ? 'connected' : 'disconnected'}</p>
+              <Circle fill={isConnected ? 'green' : 'red'} color={isConnected ? 'green' : 'red'} size={12}/>
               <CircleUser  size={24} color="gray"/>
             </div>
           :
@@ -56,6 +59,8 @@ export default function Header () {
               Login
             </button>
         }
+
+        
       </div>
     </div>
   );

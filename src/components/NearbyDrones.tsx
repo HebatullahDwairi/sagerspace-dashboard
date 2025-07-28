@@ -41,12 +41,10 @@ const NearbyDrones = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 flex-1">
+    <div className="bg-white rounded-xl shadow-sm p-4 flex-1 flex flex-col">
       <h1 className=" font-bold m-1">Nearby Drones</h1>
-      <h4 className=" font-bold text-sm mb-5 m-1 text-gray-400">
-        find drones up to 5 Km close to a specific point
-      </h4>
-      <div className="flex gap-3 items-center">
+  
+      <div className="flex gap-3 items-center ">
         <form onSubmit={handleSubmit} className="rounded-lg p-2 w-fit bg-gray-50 shadow-xs flex gap-3">
           <input
             type="text"
@@ -83,7 +81,7 @@ const NearbyDrones = () => {
       </div>
       {
         nearbyDrones.length > 0? 
-          <div className="w-full flex gap-4">
+          <div className="w-full flex gap-4 flex-1">
             <div className="w-1/2">
               <Table data={nearbyDrones} />
             </div>

@@ -4,7 +4,7 @@ import Map from "./Map";
 import type { LineString } from "geojson";
 import type { Drone } from "../contexts/DronesContext";
 import mqttClient from '../config/mqtt';
-import { point } from "@turf/turf";
+import { length, lineString, point } from "@turf/turf";
 
 const FlightPathViewer = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
@@ -12,6 +12,11 @@ const FlightPathViewer = () => {
   const [serial, setSerial] = useState('');
   const [flightPath, setFlightPath] = useState<LineString | null>(null);
   const [drone, setDrone] = useState<Drone | null>(null);
+  let totalDistance = 0;
+  if(flightPath) {
+    totalDistance = length(lineString(flightPath.coordinates));
+  }
+
 
   useEffect(() => {
     const getDrones = async () => {
@@ -40,7 +45,6 @@ const FlightPathViewer = () => {
       }
       else{
         setDrone(null);
-        
       }
 
     } catch (error) {
@@ -84,23 +88,27 @@ const FlightPathViewer = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 flex-1 flex flex-col">
       <h1 className=" font-bold mb-5 m-1">Flight Path Viewer</h1>
-      <div className="rounded-lg p-2 w-fit bg-gray-50  shadow-xs">
-        <form onSubmit={handleSubmit} className="space-x-2">
-          <label>Serial</label>
-          <input
-            type="text"
-            className="border-1 p-1 border-gray-300 rounded-lg bg-white"
-            onChange={(e) => { setSerial(e.target.value) }}
-            value={serial}
-          />
-          <button
-            type="submit"
-            className="p-1.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-500 transition-colors"
-          >
-            Find
-          </button>
-        </form>
-
+      <div className="flex justify-between">
+        <div className="rounded-lg p-2 w-fit bg-gray-50  shadow-xs">
+          <form onSubmit={handleSubmit} className="space-x-2">
+            <label>Serial</label>
+            <input
+              type="text"
+              className="border-1 p-1 border-gray-300 rounded-lg bg-white"
+              onChange={(e) => { setSerial(e.target.value) }}
+              value={serial}
+            />
+            <button
+              type="submit"
+              className="p-1.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-500 transition-colors"
+            >
+              Find
+            </button>
+          </form>
+        </div>
+        { flightPath && <div className="rounded-lg p-2 w-fit bg-gray-50  shadow-xs text-gray-500 font-bold pt-3">
+          Total distance: {totalDistance.toFixed(1)} km
+        </div>}
       </div>
       <div className="flex-1">
         {(drone && flightPath) ?

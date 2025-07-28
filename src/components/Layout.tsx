@@ -1,6 +1,7 @@
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
+import { Toaster } from "react-hot-toast";
 
 const Layout = () => {
 
@@ -11,7 +12,7 @@ const Layout = () => {
         <Sidebar />
         <div className="flex-1 flex flex-col gap-3">
           <Outlet />
-
+          <div><Toaster position="top-center"/></div>
         </div>
       </div>
     </div>
