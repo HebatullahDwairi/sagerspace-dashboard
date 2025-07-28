@@ -1,69 +1,73 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Real-Time Drone Dashboard
+---
 
-Currently, two official plugins are available:
+##  Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Clone the repo
 
-## Expanding the ESLint configuration
+```bash
+git clone https://github.com/HebatullahDwairi/sagerspace-dashboard.git
+cd sagerspace-dashboard
+````
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 2. Install dependencies
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Create .env
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```env
+# Base URL of the backend API
+VITE_API_BASE_URL=http://localhost:8000/api
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# token for accessing Mapbox
+VITE_MAPBOX_TOKEN=your_token
+
+# MQTT
+VITE_MQTT_HOST=ws://localhost:8080         # MQTT broker WebSocket URL
+VITE_MQTT_PORT=8080                        # MQTT broker port 
+VITE_MQTT_USERNAME=username                # MQTT username
+VITE_MQTT_PASSWORD=password                # MQTT password
+VITE_MQTT_CLIENT_ID=sagerspace_dashboard   # Unique client ID for MQTT connection
+
+
+```
+
+### 4. Start dev server
+
+```bash
+npm run dev
+```
+
+App runs at: `http://localhost:5173`
+
+---
+
+## Notes
+
+* Ensure the backend is running.
+* The backend (Django + MQTT + REST API) is in a separate repo.
+* Live location updates are handled through `mqtt.js`.
+
+
+---
+
+
+## Screenshots
+
+
+
+---
+
+##  Built With
+
+*  React + Vite + Typescript
+*  Tailwind CSS
+*  Mapbox with react-map-gl
+*  MQTT.js
+*  Axios
+
 ```
