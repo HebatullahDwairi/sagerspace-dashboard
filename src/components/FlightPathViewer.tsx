@@ -4,7 +4,8 @@ import Map from "./Map";
 import type { LineString } from "geojson";
 import type { Drone } from "../contexts/DronesContext";
 import mqttClient from '../config/mqtt';
-import { length, lineString, point } from "@turf/turf";
+import { length, lineString } from "@turf/turf";
+import { updateDroneFromMessage } from "../utl";
 
 const FlightPathViewer = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
@@ -55,19 +56,15 @@ const FlightPathViewer = () => {
 
     const handleMessage = (topicReceived: string, message: Buffer) => {
       if (topicReceived === topic) {
-        const data = JSON.parse(message.toString());
-        const newLocation = point([data.longitude, data.latitude]).geometry;
+        const updatedDrone = updateDroneFromMessage(topic, message);
 
         setFlightPath((prev) => ({
           type: "LineString",
-          coordinates: [...(prev?.coordinates ?? []), [data.longitude, data.latitude]]
+          coordinates: [...(prev?.coordinates ?? []), updatedDrone.last_location.coordinates]
         }));
 
         if(d) {
-          setDrone({
-            ...d,
-            last_location: newLocation
-          });
+          setDrone(updatedDrone);
         }
 
       }

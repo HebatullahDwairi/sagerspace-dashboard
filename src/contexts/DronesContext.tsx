@@ -2,9 +2,9 @@ import { createContext, useEffect, useState} from "react";
 import useAxios from "../hooks/useAxios";
 import type { Point } from "geojson";
 import mqttClient from '../config/mqtt';
-import {point} from '@turf/turf';
 import useAuth from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import { updateDroneFromMessage } from "../utl";
 
 type DronesContextType = {
   onlineDrones: Drone[],
@@ -54,77 +54,38 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
   useEffect(() => {
 
     const handleMessage = async(topic : string, message : Buffer) => {
-      const data = JSON.parse(message.toString());
       const serial = topic.split('/')[2];
-      const newLocation = point([data.longitude, data.latitude]).geometry;
-      const high =  data.height > 500;
-      const fast =  data.horizontal_speed > 10;
-      let reason = '';
-      if (high && fast)
-        reason = 'Flying higher than 500 meters and Moving faster than 10 m/s';
-      else if (high)
-        reason = 'Flying higher than 500 meters';
-      else if (fast)
-        reason = 'Moving faster than 10 m/s';
+      const drone = updateDroneFromMessage(topic, message);
 
-      const isDangerous = reason.length > 0;
-      const now = new Date().toISOString();
+      setOnlineDrones((prev) => {
+        const existing = prev.find(d => d.serial_number === serial);
 
-      
-
-
-      let existingDrone = onlineDrones.find(d => d.serial_number === serial);
-
-      if(existingDrone) {
-        if(isDangerous && !existingDrone.is_dangerous) {
+        if(existing && drone.is_dangerous && !existing.is_dangerous) {
           toast.error(`Drone with serial ${serial} is dangerous!`);
         }
-        setOnlineDrones((prev) => {
-          return prev.map(d => {
-          const updated : Drone = {
-            ...d,
-            last_location: newLocation,
-            is_dangerous: isDangerous,
-            last_seen: now
-          }
+
+        const updatedList = prev.some(d => d.serial_number === serial) ? 
+          prev.map(d => d.serial_number === serial ? drone : d)
+        :
+          [...prev, drone]
         
-          
-          return d.serial_number === serial ? updated : d
-          });
-        });
-      }
-      else {
-          const onlineRes = await api.get('/drones/online');
-          setOnlineDrones(onlineRes.data);
-      }
+        return updatedList
+      });
 
 
-      existingDrone = dangerousDrones.find(d => d.serial_number === serial);
-
-      if(existingDrone) {
-        if(isDangerous) {
-          setDangerousDrones((prev) => {
-            return prev.map(d => {
-            const updated : Drone = {
-              ...d,
-              last_location: newLocation,
-              is_dangerous: isDangerous,
-              last_seen: now
-            }
-          
+      setDangerousDrones((prev) => {
+        if(drone.is_dangerous) {
+          const updatedList = prev.some(d => d.serial_number === serial) ? 
+            prev.map(d => d.serial_number === serial ? drone : d)
+          :
+            [...prev, drone]
             
-            return d.serial_number === serial ? updated : d
-            });
-          });
+          return updatedList
         }
         else {
-          setDangerousDrones((prev) => prev.filter(d => d.serial_number !== serial));
-        }
-      }
-      else if(isDangerous) {
-          const res = await api.get('/drones/dangerous');
-          setDangerousDrones(res.data);
-      }
+          return prev.filter(d => d.serial_number !== serial)
+        }    
+      });
 
     }
 
