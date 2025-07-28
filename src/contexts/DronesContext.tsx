@@ -3,6 +3,7 @@ import useAxios from "../hooks/useAxios";
 import type { Point } from "geojson";
 import mqttClient from '../config/mqtt';
 import {point} from '@turf/turf';
+import useAuth from "../hooks/useAuth";
 
 type DronesContextType = {
   onlineDrones: Drone[],
@@ -24,7 +25,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
   const [onlineDrones, setOnlineDrones] = useState<Drone[]>([]);
   const [dangerousDrones, setDangerousDrones] = useState<Drone[]>([]);
   const api = useAxios();
-  
+  const {user} = useAuth();
 
   useEffect(() => {
 
@@ -44,7 +45,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
     getDrones();
 
     
-  }, [api]);
+  }, [api, user]);
 
 
   useEffect(() => {

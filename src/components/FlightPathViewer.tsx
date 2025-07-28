@@ -4,13 +4,14 @@ import Map from "./Map";
 import type { LineString } from "geojson";
 import type { Drone } from "../contexts/DronesContext";
 import mqttClient from '../config/mqtt';
+import { point } from "@turf/turf";
 
 const FlightPathViewer = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
   const api = useAxios();
   const [serial, setSerial] = useState('');
   const [flightPath, setFlightPath] = useState<LineString | null>(null);
-  const drone = drones.find((d) => d.serial_number === serial);
+  const [drone, setDrone] = useState<Drone | null>(null);
 
   useEffect(() => {
     const getDrones = async () => {
@@ -25,19 +26,45 @@ const FlightPathViewer = () => {
   }, [api]);
 
 
-  useEffect(() => {
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!serial) return;
+
+    const d = drones.find((d) => d.serial_number === serial);
+    try {
+      if (d) {
+        setDrone(d);
+        const res = await api.get(`drones/${serial}/flight-path/`);
+        setFlightPath(res.data);
+      }
+      else{
+        setDrone(null);
+        
+      }
+
+    } catch (error) {
+      console.log(error);
+    }   
 
     const topic = `thing/product/${serial}/osd`;
 
     const handleMessage = (topicReceived: string, message: Buffer) => {
       if (topicReceived === topic) {
         const data = JSON.parse(message.toString());
+        const newLocation = point([data.longitude, data.latitude]).geometry;
+
         setFlightPath((prev) => ({
           type: "LineString",
           coordinates: [...(prev?.coordinates ?? []), [data.longitude, data.latitude]]
         }));
 
+        if(d) {
+          setDrone({
+            ...d,
+            last_location: newLocation
+          });
+        }
 
       }
     };
@@ -52,23 +79,6 @@ const FlightPathViewer = () => {
       mqttClient.unsubscribe(topic);
       mqttClient.off('message', handleMessage);
     };
-  }, [serial]);
-
-
-
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      if (drone) {
-        const res = await api.get(`drones/${serial}/flight-path/`);
-        setFlightPath(res.data);
-      }
-
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   return (

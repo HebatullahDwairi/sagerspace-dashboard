@@ -6,6 +6,7 @@ import blackDrone from '../assets/drone-icon.png';
 import redDrone from '../assets/danger-drone-icon.png';
 import { circle } from '@turf/circle';
 import type { LineString } from 'geojson';
+import { bbox } from '@turf/turf';
 
 type MapProps = {
   drones: Drone[],
@@ -39,10 +40,11 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
         ref={mapRef}
         mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
         initialViewState={{
-          longitude: 35.9,
-          latitude: 31.9,
-          zoom: 4,
+          longitude: drones.length === 1 ? drones[0].last_location.coordinates[0] : 35.9,
+          latitude: drones.length === 1 ? drones[0].last_location.coordinates[1] : 31.9,
+          zoom: 10,
         }}
+        
         mapStyle={'mapbox://styles/mapbox/satellite-streets-v12'}
         style={{
           borderRadius: "10px",
@@ -94,23 +96,15 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
               }
             });
 
-          }
+            const [minLng, minLat, maxLng, maxLat] = bbox(c);
 
-          if(flightPath) {
-            map.addSource('flightpath', {
-              type: 'geojson',
-              data: flightPath
-            });
-            map.addLayer({
-              id: 'path',
-              source: 'flightpath',
-              type: 'line',
-              paint: {
-                'line-color': 'white',
-                'line-dasharray': [2,2],
-                'line-width': 2
-              }
-            });
+            mapRef.current?.fitBounds(
+              [
+                [minLng, minLat],
+                [maxLng, maxLat]
+              ],
+              { padding: 40, duration: 1000 }
+            );
           }
           
          }
@@ -139,6 +133,23 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             
           />
         </Source>
+        { flightPath && 
+          <Source 
+            id='flightpath'
+            type='geojson'
+            data={flightPath}
+          >
+            <Layer
+              id='path'
+              type='line'
+              paint={{
+                'line-color': 'white',
+                'line-dasharray': [2,2],
+                'line-width': 2
+              }}
+            />
+          </Source>
+        }
         {popupData && <Popup
           longitude={popupData?.long}
           latitude={popupData?.lat}
@@ -147,6 +158,7 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             setPopupData(null);
           }}
         >
+
           <div className='p-2 space-y-2 text-gray-700'>
             <h2 className='font-bold mb-4'>Drone Info</h2>
             <p>

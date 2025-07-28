@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { api } from "../api/apiClient";
+import { baseApi } from "../api/apiClient";
 
 const useRefreshToken = () => {
   const refresh = useCallback(async () => {
     try {
-      const res = await api.post('/token/refresh/');
+      const res = await baseApi.post('/token/refresh/');
       return res.data.access;
     }
     catch (err) {
