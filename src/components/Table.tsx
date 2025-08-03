@@ -9,7 +9,7 @@ import {
   type PaginationState,
 } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Drone } from '../contexts/DronesContext'
+import type { Drone } from '../interfaces/Drone'
 
 
 

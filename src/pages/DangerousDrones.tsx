@@ -1,5 +1,5 @@
 import useDrones from "../hooks/useDrones";
-import Map from "./Map";
+import Map from "../components/Map";
 
 
 const DangerousDrones = () => {

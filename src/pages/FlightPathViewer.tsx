@@ -1,14 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import useAxios from "../hooks/useAxios";
-import Map from "./Map";
+import Map from "../components/Map";
 import type { LineString } from "geojson";
-import type { Drone } from "../contexts/DronesContext";
+import type { Drone } from "../interfaces/Drone";
 import mqttClient from '../config/mqtt';
 import { length, lineString } from "@turf/turf";
 import { updateDroneFromMessage } from "../utl";
+import DroneService from "../services/DroneService";
 
 const FlightPathViewer = () => {
-  const [drones, setDrones] = useState<Drone[]>([]);
   const api = useAxios();
   const [serial, setSerial] = useState('');
   const [flightPath, setFlightPath] = useState<LineString | null>(null);
@@ -16,25 +16,16 @@ const FlightPathViewer = () => {
   const totalDistance = flightPath ? length(lineString(flightPath.coordinates)) : 0;
 
 
-  useEffect(() => {
-    const getDrones = async () => {
-      try {
-        const res = await api.get('/drones/');
-        setDrones(res.data);
-      } catch (error) {
-        console.log("failed to fetch drones", error);
-      }
-    };
-    getDrones();
-  }, [api]);
-
-
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!serial) return;
-
-    const d = drones.find((d) => d.serial_number === serial);
+    
+    const service = new DroneService(api);
+    const d = await service.getFilteredDrones(serial)[0];
+    console.log(d);
+    
+    
     try {
       if (d) {
         setDrone(d);

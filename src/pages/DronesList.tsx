@@ -1,27 +1,17 @@
-import Table from "./Table";
-import useAxios from "../hooks/useAxios";
+import Table from "../components/Table";
 import { useEffect, useState } from "react";
-import type { Drone } from "../contexts/DronesContext";
+import type { Drone } from "../interfaces/Drone";
+import useGetDrones from "../hooks/useGetDrones";
+import DroneService from "../services/DroneService";
+import useAxios from "../hooks/useAxios";
 
 const DronesList = () => {
-  const [drones, setDrones] = useState<Drone[]>([]);
+  const { data, isLoading } = useGetDrones();
+  const drones = data;
+  
   const [searchValue, setSearchValue] = useState('');
   const [filteredDrones, setFilteredDrones] = useState<Drone[] | null>(null);
   const api = useAxios();
-
-
-  useEffect(() => {
-    const getDrones = async () => {
-      try {
-        const res = await api.get('/drones/');
-        setDrones(res.data);
-      } catch (error) {
-        console.log("failed to fetch drones", error);
-      }
-    };
-
-    getDrones();
-  }, [api]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -32,8 +22,9 @@ const DronesList = () => {
 
       const fetchFiltered = async () => {
         try {
-          const res = await api.get(`/drones/?partial_serial=${searchValue}`);
-          setFilteredDrones(res.data);
+          const service = new DroneService(api);
+          const filtered = await service.getFilteredDrones(searchValue);
+          setFilteredDrones(filtered);
         } 
         catch (error) {
           console.log(error);
@@ -45,8 +36,12 @@ const DronesList = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchValue, api]);
+  }, [api, searchValue]);
 
+
+  if(isLoading) {
+    return <div>loading...</div>
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">

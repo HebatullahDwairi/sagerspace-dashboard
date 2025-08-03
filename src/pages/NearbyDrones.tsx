@@ -1,8 +1,9 @@
 import { useState } from "react";
-import Table from "./Table";
-import type { Drone } from "../contexts/DronesContext";
+import Table from "../components/Table";
+import type { Drone } from "../interfaces/Drone";
 import useAxios from "../hooks/useAxios";
-import Map from "./Map";
+import Map from "../components/Map";
+import DroneService from "../services/DroneService";
 
 const NearbyDrones = () => {
   const [nearbyDrones, setNearbyDrones] = useState<Drone[]>([]);
@@ -27,8 +28,9 @@ const NearbyDrones = () => {
     if(!longitude || !latitude) return;
   
     try {
-      const res = await api.get(`drones/within-5km/?latitude=${latitude}&longitude=${longitude}`);
-      setNearbyDrones(res.data);
+      const service = new DroneService(api);
+      const nearby = await service.getNearbyDrones(longitude, latitude);
+      setNearbyDrones(nearby);
       setCoordinates({
         longitude: '',
         latitude: ''

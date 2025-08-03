@@ -3,13 +3,13 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import { lazy } from "react"
 
 const Layout = lazy(() => (import("./components/Layout")));
-const Dashboard = lazy(() => (import("./components/Dashboard")));
-const Login = lazy(() => (import("./components/Login")));
-const DronesList = lazy(() => (import("./components/DronesList")));
-const OnlineDrones = lazy(() => (import("./components/OnlineDrones")));
-const DangerousDrones = lazy(() => (import("./components/DangerousDrones")));
-const FlightPathViewer = lazy(() => (import("./components/FlightPathViewer")));
-const NearbyDrones = lazy(() => (import("./components/NearbyDrones")));
+const Dashboard = lazy(() => (import("./pages/Dashboard")));
+const Login = lazy(() => (import("./pages/Login")));
+const DronesList = lazy(() => (import("./pages/DronesList")));
+const OnlineDrones = lazy(() => (import("./pages/OnlineDrones")));
+const DangerousDrones = lazy(() => (import("./pages/DangerousDrones")));
+const FlightPathViewer = lazy(() => (import("./pages/FlightPathViewer")));
+const NearbyDrones = lazy(() => (import("./pages/NearbyDrones")));
 
 function App() {
 

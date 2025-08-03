@@ -1,6 +1,6 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxMap, { NavigationControl, FullscreenControl, Source, Layer, type MapRef, Popup } from 'react-map-gl/mapbox';
-import type { Drone } from '../contexts/DronesContext';
+import type { Drone } from '../interfaces/Drone';
 import { useRef, useState } from 'react';
 import blackDrone from '../assets/drone-icon.png';
 import redDrone from '../assets/danger-drone-icon.png';
@@ -8,7 +8,7 @@ import { circle } from '@turf/circle';
 import type { LineString } from 'geojson';
 import { bbox } from '@turf/turf';
 
-type MapProps = {
+interface MapProps {
   drones: Drone[],
   point? : number[],
   flightPath?: LineString

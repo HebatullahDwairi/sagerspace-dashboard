@@ -1,5 +1,5 @@
 import { point } from "@turf/turf";
-import type { Drone } from "./contexts/DronesContext";
+import type { Drone } from "./interfaces/Drone";
 
 export const updateDroneFromMessage = (topic: string, message: Buffer) => {
   const data = JSON.parse(message.toString());

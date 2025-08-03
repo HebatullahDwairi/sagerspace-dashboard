@@ -1,25 +1,15 @@
 import { createContext, useEffect, useState} from "react";
-import useAxios from "../hooks/useAxios";
-import type { Point } from "geojson";
 import mqttClient from '../config/mqtt';
-import useAuth from "../hooks/useAuth";
 import toast from "react-hot-toast";
 import { updateDroneFromMessage } from "../utl";
+import type { Drone } from "../interfaces/Drone";
+import useGetOnlineDrones from "../hooks/useGetOnlineDrones";
+import useGetDangerousDrones from "../hooks/useGetDangerousDrones";
 
 type DronesContextType = {
   onlineDrones: Drone[],
   dangerousDrones: Drone[],
   isConnected: boolean
-};
-
-export type Drone = {
-  serial_number : string,
-  is_dangerous : boolean,
-  dangerous_reason : string,
-  last_location : Point,
-  last_seen: string,
-  last_height? : number,
-  last_speed? : number
 };
 
 
@@ -29,28 +19,13 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
   const [onlineDrones, setOnlineDrones] = useState<Drone[]>([]);
   const [dangerousDrones, setDangerousDrones] = useState<Drone[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const api = useAxios();
-  const {user} = useAuth();
+  const online = useGetOnlineDrones();
+  const dangerous = useGetDangerousDrones();
 
   useEffect(() => {
-
-    const getDrones = async() => {
-      try {
-        const onlineRes = await api.get('/drones/online');
-        const dangerousRes = await api.get('/drones/dangerous');
-
-        setOnlineDrones(onlineRes.data);
-        setDangerousDrones(dangerousRes.data);
-      } 
-      catch (error) {
-        console.log(error);
-        
-      }
-    }
-    getDrones();
-
-    
-  }, [api, user]);
+    setOnlineDrones(online.data);
+    setDangerousDrones(dangerous.data)
+  }, [dangerous.data, online.data]);
 
 
   useEffect(() => {
@@ -107,7 +82,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
       mqttClient.off('message', handleMessage);
     }
 
-  }, [api]);
+  }, []);
 
 
   return (
