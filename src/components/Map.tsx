@@ -50,6 +50,20 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
           borderRadius: "10px",
         }}
 
+        interactiveLayerIds={['drone']}
+
+        onClick={(e) => {
+          const serial = e.features?.[0]?.properties?.serial;
+          const drone = drones.filter(drone => drone.serial_number === serial)[0];
+
+          setPopupData({
+            long: drone.last_location.coordinates[0],
+            lat: drone.last_location.coordinates[1],
+            drone: drone
+          });
+          console.log(drone);
+        }}
+
         onLoad={() => {
           const map = mapRef.current?.getMap();
           if(!map) return;
@@ -65,22 +79,8 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             map.addImage('red-drone', image);
           });
 
-          map.on('click', 'drone', (e) => {
-            const serial = e.features?.[0]?.properties?.serial;
-            const drone = drones.filter(drone => drone.serial_number === serial)[0];
-
-            setPopupData({
-              long: drone.last_location.coordinates[0],
-              lat: drone.last_location.coordinates[1],
-              drone: drone
-            });
-            console.log(drone);
-            
-          });
-
 
           if(point) {
-
             const c = circle(point, 5, { steps: 60, units: 'kilometers' });
             map.addSource('circle', {
               type: 'geojson',
@@ -122,15 +122,6 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
               'icon-image': ['get', 'icon'],
               'icon-size': 0.4
             }}
-            paint={{
-              'icon-opacity-transition' : {duration: 0},
-              'icon-color-transition' : {duration: 0},
-              'icon-halo-blur-transition': {duration: 0},
-              'icon-halo-color-transition': {duration: 0},
-              'icon-halo-width-transition': {duration: 0},
-
-            }}
-            
           />
         </Source>
         { flightPath && 
@@ -164,6 +155,14 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             <p>
               <span className="font-bold">Serial Number: </span>
                {popupData.drone.serial_number}
+            </p>
+            <p>
+              <span className="font-bold">Speed : </span> 
+                {popupData.drone.last_speed?.toFixed(2)} m/s
+            </p>
+            <p>
+              <span className="font-bold">Height : </span> 
+                {popupData.drone.last_height?.toFixed(2)} m
             </p>
             <p>
               <span className="font-bold">Dangerous? :</span> 

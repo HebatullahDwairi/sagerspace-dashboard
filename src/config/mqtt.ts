@@ -8,7 +8,7 @@ const password = import.meta.env.VITE_MQTT_PASSWORD;
 
 const url = `${host}:${port}`;
 
-const options = {
+const options: mqtt.IClientOptions = {
   clientId,
   clean: true,
   connectTimeout: 4000,

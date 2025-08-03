@@ -13,10 +13,7 @@ const FlightPathViewer = () => {
   const [serial, setSerial] = useState('');
   const [flightPath, setFlightPath] = useState<LineString | null>(null);
   const [drone, setDrone] = useState<Drone | null>(null);
-  let totalDistance = 0;
-  if(flightPath) {
-    totalDistance = length(lineString(flightPath.coordinates));
-  }
+  const totalDistance = flightPath ? length(lineString(flightPath.coordinates)) : 0;
 
 
   useEffect(() => {

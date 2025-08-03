@@ -22,7 +22,6 @@ export default function Table({ data }: {data: Drone[]}) {
   });
 
 
-
   const colHelper = createColumnHelper<Drone>()
   const cols = [
     colHelper.accessor('serial_number', {

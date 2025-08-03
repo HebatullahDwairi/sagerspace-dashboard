@@ -1,13 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Layout from "./components/Layout"
-import Dashboard from "./components/Dashboard"
-import Login from "./components/Login"
-import DronesList from "./components/DronesList"
-import OnlineDrones from "./components/OnlineDrones"
-import DangerousDrones from "./components/DangerousDrones"
-import FlightPathViewer from "./components/FlightPathViewer"
-import NearbyDrones from "./components/NearbyDrones"
 import ProtectedRoute from "./components/ProtectedRoute"
+import { lazy } from "react"
+
+const Layout = lazy(() => (import("./components/Layout")));
+const Dashboard = lazy(() => (import("./components/Dashboard")));
+const Login = lazy(() => (import("./components/Login")));
+const DronesList = lazy(() => (import("./components/DronesList")));
+const OnlineDrones = lazy(() => (import("./components/OnlineDrones")));
+const DangerousDrones = lazy(() => (import("./components/DangerousDrones")));
+const FlightPathViewer = lazy(() => (import("./components/FlightPathViewer")));
+const NearbyDrones = lazy(() => (import("./components/NearbyDrones")));
 
 function App() {
 

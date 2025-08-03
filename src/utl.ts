@@ -24,7 +24,9 @@ export const updateDroneFromMessage = (topic: string, message: Buffer) => {
     is_dangerous: isDangerous,
     dangerous_reason: reason,
     serial_number: serial,
-    last_seen: now
+    last_seen: now,
+    last_speed: data.horizontal_speed,
+    last_height: data.height
   }
 
   return drone;

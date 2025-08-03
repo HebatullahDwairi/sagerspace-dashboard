@@ -6,6 +6,7 @@ import { ClipLoader } from "react-spinners";
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login, isLoading, user } = useAuth();
 
@@ -22,6 +23,7 @@ const Login = () => {
       login(username, password);
     }
     catch (e) {
+      setError('failed to log in, try again');
       console.log('login error', e);
     }
   }
@@ -51,6 +53,10 @@ const Login = () => {
           onChange={(e) => {
             setPassword(e.target.value)
           }}/>
+          {error && 
+          <p className="font-sm text-red-700 p-2">
+            {error}  
+          </p>}
         <button type="submit" className="p-1.5 bg-red-600 text-white rounded-xl mt-3 font-bold hover:bg-red-500 transition-colors">login</button>
       </form>
       }

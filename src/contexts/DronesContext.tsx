@@ -13,11 +13,13 @@ type DronesContextType = {
 };
 
 export type Drone = {
-  serial_number: string,
-  is_dangerous: boolean,
-  dangerous_reason: string,
-  last_location: Point,
+  serial_number : string,
+  is_dangerous : boolean,
+  dangerous_reason : string,
+  last_location : Point,
   last_seen: string,
+  last_height? : number,
+  last_speed? : number
 };
 
 
@@ -118,3 +120,6 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
 
 
 export default DronesContext;
+
+
+
