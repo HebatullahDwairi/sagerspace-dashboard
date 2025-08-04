@@ -7,6 +7,7 @@ import mqttClient from '../config/mqtt';
 import { length, lineString } from "@turf/turf";
 import { updateDroneFromMessage } from "../utl";
 import DroneService from "../services/DroneService";
+import toast from "react-hot-toast";
 
 const FlightPathViewer = () => {
   const api = useAxios();
@@ -14,33 +15,34 @@ const FlightPathViewer = () => {
   const [flightPath, setFlightPath] = useState<LineString | null>(null);
   const [drone, setDrone] = useState<Drone | null>(null);
   const totalDistance = flightPath ? length(lineString(flightPath.coordinates)) : 0;
-
-
+  const [topic, setTopic] = useState<string>('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!serial) return;
     
-    const service = new DroneService(api);
-    const d = await service.getFilteredDrones(serial)[0];
-    console.log(d);
-    
-    
     try {
+      const service = new DroneService(api);
+      const d = await service.getBySerial(serial);
+
       if (d) {
         setDrone(d);
-        const res = await api.get(`drones/${serial}/flight-path/`);
-        setFlightPath(res.data);
-      }
-      else{
-        setDrone(null);
+        setTopic(`thing/product/${serial}/osd`);
+        const path = await service.getFlightPath(serial);
+        setFlightPath(path);
       }
 
     } catch (error) {
       console.log(error);
+      setDrone(null);
+      toast.error('could not find a drone with this serial')
     }   
+  }
 
-    const topic = `thing/product/${serial}/osd`;
+  useEffect(() => {
+    if (!topic) return;
+
+    const curSerial = topic.split('/')[2];
 
     const handleMessage = (topicReceived: string, message: Buffer) => {
       if (topicReceived === topic) {
@@ -50,16 +52,13 @@ const FlightPathViewer = () => {
           type: "LineString",
           coordinates: [...(prev?.coordinates ?? []), updatedDrone.last_location.coordinates]
         }));
-
-        if(d) {
-          setDrone(updatedDrone);
-        }
+        setDrone(updatedDrone);
 
       }
     };
 
     mqttClient.subscribe(topic, () => {
-      console.log('Subscribed to topic of drone: ', serial);
+      console.log('Subscribed to topic of drone: ', curSerial);
     });
 
     mqttClient.on('message', handleMessage);
@@ -67,8 +66,9 @@ const FlightPathViewer = () => {
     return () => {
       mqttClient.unsubscribe(topic);
       mqttClient.off('message', handleMessage);
+      console.log('Unubscribed from topic of drone: ', curSerial);
     };
-  }
+  }, [topic]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 flex-1 flex flex-col">

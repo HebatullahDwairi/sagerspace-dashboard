@@ -1,7 +1,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxMap, { NavigationControl, FullscreenControl, Source, Layer, type MapRef, Popup } from 'react-map-gl/mapbox';
 import type { Drone } from '../interfaces/Drone';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import blackDrone from '../assets/drone-icon.png';
 import redDrone from '../assets/danger-drone-icon.png';
 import { circle } from '@turf/circle';
@@ -15,6 +15,7 @@ interface MapProps {
 };
 
 const Map = ({ drones, point, flightPath }: MapProps) => {
+  const [isLoaded, setIsloaded] = useState(false);
   const points = drones.map(drone => (
     {
       type: 'Feature' as const,
@@ -32,6 +33,44 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
     lat: number,
     drone: Drone,
   } | null>(null);
+
+  useEffect(() => {
+    if(!point || !mapRef.current || !isLoaded) return;
+    
+    const map = mapRef.current.getMap();
+    const c = circle(point, 5, { steps: 60, units: 'kilometers' });
+
+    if (map.getSource('circle')) {
+      (map.getSource('circle') as mapboxgl.GeoJSONSource ).setData(c);
+    } 
+    else {
+      map.addSource('circle', {
+        type: 'geojson',
+        data: c,
+      });
+
+      map.addLayer({
+        id: 'point',
+        source: 'circle',
+        type: 'line',
+        paint: {
+          'line-color': 'red',
+          'line-width': 2,
+        },
+      });
+    }
+
+    const [minLng, minLat, maxLng, maxLat] = bbox(c);
+
+    mapRef.current?.fitBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat]
+      ],
+      { padding: 40, duration: 1000 }
+    );
+    
+  }, [isLoaded, point]);
   
 
   return (
@@ -42,7 +81,7 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
         initialViewState={{
           longitude: drones.length === 1 ? drones[0].last_location.coordinates[0] : 35.9,
           latitude: drones.length === 1 ? drones[0].last_location.coordinates[1] : 31.9,
-          zoom: 10,
+          zoom: 15,
         }}
         
         mapStyle={'mapbox://styles/mapbox/satellite-streets-v12'}
@@ -65,6 +104,7 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
         }}
 
         onLoad={() => {
+          setIsloaded(true);
           const map = mapRef.current?.getMap();
           if(!map) return;
 
@@ -79,33 +119,6 @@ const Map = ({ drones, point, flightPath }: MapProps) => {
             map.addImage('red-drone', image);
           });
 
-
-          if(point) {
-            const c = circle(point, 5, { steps: 60, units: 'kilometers' });
-            map.addSource('circle', {
-              type: 'geojson',
-              data: c
-            });
-            map.addLayer({
-              id: 'point',
-              source: 'circle',
-              type: 'line',
-              paint: {
-                'line-color': 'red',
-                'line-width': 2
-              }
-            });
-
-            const [minLng, minLat, maxLng, maxLat] = bbox(c);
-
-            mapRef.current?.fitBounds(
-              [
-                [minLng, minLat],
-                [maxLng, maxLat]
-              ],
-              { padding: 40, duration: 1000 }
-            );
-          }
           
          }
         }

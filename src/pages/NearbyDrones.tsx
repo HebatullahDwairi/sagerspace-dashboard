@@ -7,35 +7,23 @@ import DroneService from "../services/DroneService";
 
 const NearbyDrones = () => {
   const [nearbyDrones, setNearbyDrones] = useState<Drone[]>([]);
-  const [coordinates, setCoordinates] = useState<{
-    longitude: string,
-    latitude: string
-  } >({
-    longitude: '',
-    latitude: ''
-  });
+  const [coordinates, setCoordinates] = useState<[string, string]>(['', '']);
 
-  const [point, setPoint] = useState<number[]>([]);
 
   const api = useAxios();
 
   const handleSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const longitude = parseFloat(coordinates.longitude);
-    const latitude = parseFloat(coordinates.latitude);
+    const longitude = parseFloat(coordinates[0]);
+    const latitude = parseFloat(coordinates[1]);
 
-    if(!longitude || !latitude) return;
+    if (isNaN(longitude) || isNaN(latitude)) return;
   
     try {
       const service = new DroneService(api);
       const nearby = await service.getNearbyDrones(longitude, latitude);
       setNearbyDrones(nearby);
-      setCoordinates({
-        longitude: '',
-        latitude: ''
-      })
-      setPoint([longitude, latitude]);
 
     } catch (error) {
       console.log(error);
@@ -52,25 +40,15 @@ const NearbyDrones = () => {
             type="text"
             placeholder="longitude"
             className="border-1 p-1 border-gray-300 rounded-lg bg-white w-30"
-            value={coordinates.longitude}
-            onChange={(e) => {
-              setCoordinates({
-                ...coordinates,
-                longitude: e.target.value
-              });
-            }}
+            value={coordinates[0]}
+            onChange={(e) => setCoordinates([e.target.value, coordinates[1]])}
           />
           <input
             type="text"
             placeholder="latitude"
             className="border-1 p-1 border-gray-300 rounded-lg bg-white w-30"
-            value={coordinates.latitude}
-            onChange={(e) => {
-              setCoordinates({
-                ...coordinates,
-                latitude: e.target.value
-              });
-            }}
+            value={coordinates[1]}
+            onChange={(e) => setCoordinates([coordinates[0], e.target.value])}
           />
           <button
             type="submit"
@@ -79,7 +57,6 @@ const NearbyDrones = () => {
             Find
           </button>
         </form>
-        { point.length > 0 && <h2>drones within 5km from point {point[0]}, {point[1]}</h2>}
       </div>
       {
         nearbyDrones.length > 0? 
@@ -88,7 +65,11 @@ const NearbyDrones = () => {
               <Table data={nearbyDrones} />
             </div>
             <div className="bg-white rounded-xl shadow-sm p-4 flex-1 w-1/2">
-              <Map drones={nearbyDrones} point={point}/>
+              <Map 
+                drones={nearbyDrones} 
+                point={[parseFloat(coordinates[0]), parseFloat(coordinates[1])]} 
+              />
+
             </div>
           </div>
         :

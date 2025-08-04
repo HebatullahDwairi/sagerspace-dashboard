@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { lazy } from "react"
 
@@ -21,12 +21,13 @@ function App() {
               <Layout />
             </ProtectedRoute>
           }>
-            <Route path="dashboard" index  element={<Dashboard />}/>
-            <Route path="drones-list" index  element={<DronesList />}/>
-            <Route path="online-drones" index  element={<OnlineDrones />}/>
-            <Route path="dangerous-drones" index  element={<DangerousDrones />}/>
-            <Route path="path-viewer" index  element={<FlightPathViewer />}/>
-            <Route path="nearby-drones" index  element={<NearbyDrones />}/>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />}/>
+            <Route path="drones-list" element={<DronesList />}/>
+            <Route path="online-drones"  element={<OnlineDrones />}/>
+            <Route path="dangerous-drones"   element={<DangerousDrones />}/>
+            <Route path="path-viewer"  element={<FlightPathViewer />}/>
+            <Route path="nearby-drones"  element={<NearbyDrones />}/>
           </Route>
           <Route path="/login" element={<Login />} />
         </Routes>

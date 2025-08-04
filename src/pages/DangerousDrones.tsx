@@ -1,9 +1,15 @@
 import useDrones from "../hooks/useDrones";
 import Map from "../components/Map";
+import { useEffect } from "react";
 
 
 const DangerousDrones = () => {
-  const { dangerousDrones } = useDrones();
+  const { dangerousDrones, fetchDangerousDrones } = useDrones();
+
+  useEffect(() => {
+    fetchDangerousDrones();
+    
+  }, [fetchDangerousDrones]);
 
   
   return (

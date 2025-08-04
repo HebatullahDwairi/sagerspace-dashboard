@@ -12,8 +12,9 @@ const useAxios = () => {
   useEffect(() => {
     const requestIntercept = api.interceptors.request.use(
       (config) => {
-        if (!config.headers['Authorization']) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
+        const token = localStorage.getItem('accessToken');
+        if (!config.headers['Authorization'] && token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },
@@ -29,6 +30,7 @@ const useAxios = () => {
         if(error.response && error.response.status === 401 && !originalRequest.retry) {
           originalRequest.retry = true;
           const newToken = await refresh();
+          localStorage.setItem('accessToken', newToken);
           originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 
           const user: User = jwtDecode(newToken);

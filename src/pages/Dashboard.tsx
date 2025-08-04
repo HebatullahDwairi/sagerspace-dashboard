@@ -1,47 +1,34 @@
-import { useEffect, useState } from "react";
-import useDrones from "../hooks/useDrones";
-import useAxios from "../hooks/useAxios";
 import { Radar, AlertTriangle, Drone } from "lucide-react";
+import useGetStats from "../hooks/useGetStats";
 
 const Dashboard = () => {
-  const [total, setTotal] = useState(0);
-  const api = useAxios();
 
-  useEffect(() => {
-    const getDrones = async () => {
-      try {
-        const res = await api.get("/drones/");
-        setTotal(res.data.length);
-      } catch (error) {
-        console.log("Failed to fetch drones", error);
-      }
-    };
+  const {data, isLoading} = useGetStats();
 
-    getDrones();
-  }, [api]);
-
-  const { dangerousDrones, onlineDrones } = useDrones();
+  if(isLoading) return <div>loading...</div>;
 
   const stats = [
     {
       label: "Total Drones",
-      value: total,
+      value: data.total,
       icon: <Drone className="text-blue-600 w-7 h-7" />,
       bg: "bg-blue-50",
     },
     {
       label: "Dangerous Drones",
-      value: dangerousDrones?.length ?? 0,
+      value: data.dangerous,
       icon: <AlertTriangle className="text-red-600 w-7 h-7" />,
       bg: "bg-red-50",
     },
     {
       label: "Online Drones",
-      value: onlineDrones?.length ?? 0,
+      value: data.online,
       icon: <Radar className="text-green-600 w-7 h-7" />,
       bg: "bg-green-50",
     },
   ];
+
+  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">

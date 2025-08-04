@@ -5,27 +5,25 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 
-const useGetOnlineDrones = (options = { enabled: true }) => {
+const useGetStats = () => {
   const api = useAxios();
   const service = new DroneService(api);
 
 
-  const { isError, error, data, isLoading, refetch } =  useQuery({
-    queryKey: ['online-drones'],
-    queryFn: service.getOnlineDrones.bind(service),
+  const { isError, error, data, isLoading } =  useQuery({
+    queryKey: ['stats'],
+    queryFn: service.getStats.bind(service),
     staleTime: 1000,  
-    enabled: options.enabled
   });
 
   useEffect(() => {
     if(isError) {
       toast.error(error.message);
     }
-    
   }, [error, isError]);
 
-  return { isLoading, data, refetch };
+  return { isLoading, data };
  
 }
 
-export default useGetOnlineDrones;
+export default useGetStats;
