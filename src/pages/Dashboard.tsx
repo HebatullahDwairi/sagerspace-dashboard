@@ -1,11 +1,12 @@
 import { Radar, AlertTriangle, Drone } from "lucide-react";
 import useGetStats from "../hooks/useGetStats";
+import LoadingComponent from "../components/LoadingComponent";
 
 const Dashboard = () => {
 
   const {data, isLoading} = useGetStats();
 
-  if(isLoading) return <div>loading...</div>;
+  if(isLoading) return <LoadingComponent />;
 
   const stats = [
     {

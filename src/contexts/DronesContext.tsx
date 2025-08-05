@@ -48,6 +48,7 @@ export const DronesProvider : React.FC<{children: React.ReactNode}> = ({children
     const handleMessage = async(topic : string, message : Buffer) => {
       const serial = topic.split('/')[2];
       const drone = updateDroneFromMessage(topic, message);
+      
 
       if(updatesEnabled.current.online) {
         setOnlineDrones((prev) => {

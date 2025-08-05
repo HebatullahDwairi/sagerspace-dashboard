@@ -3,7 +3,7 @@ import useAuth from "./useAuth";
 import useRefreshToken from "./useRefreshToken";
 import { api } from "../api/apiClient";
 import { jwtDecode } from "jwt-decode";
-import type { User } from "../contexts/AuthContext";
+import type { User } from "../interfaces/User";
 
 const useAxios = () => {
   const { user, setUser, accessToken } = useAuth();

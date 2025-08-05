@@ -6,7 +6,7 @@ const clientId = import.meta.env.VITE_MQTT_CLIENT_ID || `sagerspace_client_${Mat
 const username = import.meta.env.VITE_MQTT_USERNAME;
 const password = import.meta.env.VITE_MQTT_PASSWORD;
 
-const url = `${host}:${port}`;
+const url = `wss://${host}:${port}/mqtt`;
 
 const options: mqtt.IClientOptions = {
   clientId,

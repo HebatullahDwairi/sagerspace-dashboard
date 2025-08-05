@@ -2,8 +2,9 @@ import { createContext, useEffect, useState, type Dispatch, type SetStateAction 
 import authService from "../services/AuthService";
 import { jwtDecode } from "jwt-decode";
 import useRefreshToken from "../hooks/useRefreshToken";
+import type { User } from "../interfaces/User";
 
-type AuthContextType = {
+interface AuthContextType  {
   user: User | null,
   setUser: Dispatch<SetStateAction<User | null>>,
   isLoading: boolean,
@@ -11,9 +12,6 @@ type AuthContextType = {
   accessToken: string,
 };
 
-export type User = {
-  user_id: number
-};
 
 const AuthContext = createContext<AuthContextType | null>(null);
 

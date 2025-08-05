@@ -4,6 +4,7 @@ import type { Drone } from "../interfaces/Drone";
 import useGetDrones from "../hooks/useGetDrones";
 import DroneService from "../services/DroneService";
 import useAxios from "../hooks/useAxios";
+import LoadingComponent from "../components/LoadingComponent";
 
 const DronesList = () => {
   const { data, isLoading } = useGetDrones();
@@ -40,7 +41,7 @@ const DronesList = () => {
 
 
   if(isLoading) {
-    return <div>loading...</div>
+    return <LoadingComponent />
   }
 
   return (

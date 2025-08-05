@@ -105,16 +105,20 @@ export default function Table({ data }: {data: Drone[]}) {
             onClick={() => { table.previousPage() }}
             className=' border-1 border-gray-300 rounded-md'
           >
-
-            <ChevronLeft size={22} />
+            <ChevronLeft 
+              size={22} 
+              color={table.getCanPreviousPage() ? 'black' : 'gray'} 
+            />
           </button>
           <button
             disabled={!table.getCanNextPage()}
             onClick={() => { table.nextPage() }}
             className=' border-1 border-gray-300 rounded-md'
           >
-
-            <ChevronRight size={22} />
+            <ChevronRight 
+              size={22} 
+              color={table.getCanNextPage() ? 'black' : 'gray'}
+            />
           </button>
         </div>
       </div>
