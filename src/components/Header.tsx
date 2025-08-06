@@ -1,4 +1,4 @@
-import { CircleUser, CloudSun, Search, Circle } from "lucide-react";
+import { CircleUser, CloudSun, Circle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
@@ -30,35 +30,29 @@ export default function Header () {
     <div className="w-screen bg-white shadow-sm ">
       <div className="p-2 flex justify-between items-center mx-auto max-w-7xl">
         <p className="font-black text-xl italic not-lg:ml-17">SAGER</p>
-        <div className="flex items-center">
-          <input
-            type="text" 
-            placeholder="search"
-            className="border-gray-300 border rounded-md p-1 lg:w-50 w-12 pl-9"
-          />   
-          <Search color="gray"size={19} className="-ml-9 lg:-ml-48"/>
+       
+        <div className="flex gap-8">
+          <div className="flex gap-3 items-center text-gray00">
+            <p>{hours}:{mins} </p>
+            <CloudSun size={16} color="teal"/>
+          </div>
+          {
+            context?.user?.user_id ?
+              <div className="flex gap-3 items-center">
+                <p className="text-gray-500">{isConnected ? 'connected' : 'disconnected'}</p>
+                <Circle fill={isConnected ? 'green' : 'red'} color={isConnected ? 'green' : 'red'} size={12}/>
+                <CircleUser  size={24} color="gray"/>
+              </div>
+            :
+              <button
+                onClick={()=> {
+                  navigate('login');
+                }}
+              >
+                Login
+              </button>
+          }
         </div>
-        <div className="flex gap-3 items-center text-gray-800">
-          <p>{hours}:{mins} </p>
-          <CloudSun size={16} color="teal"/>
-          <p>33</p>
-        </div>
-        {
-          context?.user?.user_id ? 
-            <div className="flex gap-3 items-center">
-              <p className="text-gray-500">{isConnected ? 'connected' : 'disconnected'}</p>
-              <Circle fill={isConnected ? 'green' : 'red'} color={isConnected ? 'green' : 'red'} size={12}/>
-              <CircleUser  size={24} color="gray"/>
-            </div>
-          :
-            <button
-              onClick={()=> {
-                navigate('login');
-              }}
-            >
-              Login
-            </button>
-        }
 
         
       </div>
