@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import type { User } from "../interfaces/User";
 
 const useAxios = () => {
-  const { user, setUser, accessToken } = useAuth();
+  const { setUser } = useAuth();
   const refresh = useRefreshToken();
 
   useEffect(() => {
@@ -27,16 +27,24 @@ const useAxios = () => {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        if(error.response && error.response.status === 401 && !originalRequest.retry) {
-          originalRequest.retry = true;
-          const newToken = await refresh();
-          localStorage.setItem('accessToken', newToken);
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        try {
+          if(error.response && error.response.status === 401 && !originalRequest.retry) {
+            originalRequest.retry = true;
+            const newToken = await refresh();
+            localStorage.setItem('accessToken', newToken);
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 
-          const user: User = jwtDecode(newToken);
-          setUser({user_id: user.user_id});
-          
-          return api(originalRequest);
+            const user: User = jwtDecode(newToken);
+            setUser(user);
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            return api(originalRequest);
+          }
+        } catch (err) {
+          setUser(null);
+          localStorage.removeItem('user');
+          localStorage.removeItem('accessToken');
+          return Promise.reject(err);
         }
 
         return Promise.reject(error);
@@ -48,7 +56,7 @@ const useAxios = () => {
       api.interceptors.response.eject(responseIntercept);
     });
 
-  }, [user, refresh, accessToken, setUser]);
+  }, [refresh, setUser]);
 
   return api;
 }

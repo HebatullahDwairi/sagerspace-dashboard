@@ -32,7 +32,7 @@ export default function Header () {
         <p className="font-black text-xl italic not-lg:ml-17">SAGER</p>
        
         <div className="flex gap-8">
-          <div className="flex gap-3 items-center text-gray00">
+          <div className="flex gap-3 items-center text-gray-500">
             <p>{hours}:{mins} </p>
             <CloudSun size={16} color="teal"/>
           </div>
